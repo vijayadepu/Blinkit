@@ -1,0 +1,44 @@
+name: ci-build-asp.net-project
+on:
+    workflow_dispatch:
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v3
+            - name: azure login
+              uses: azure/login@v1
+              with:
+                creds: ${{ secrets.AZ_CRED }}
+            - name: terraform install
+              uses: hashicorp/setup-terraform@v1
+            - name: terraform init
+              working-directory: ./Terraform
+              run: terraform init
+            - name: terraform apply
+              working-directory: ./Terraform
+              run: terraform apply -auto-approve
+            - name: setup dotnet
+              uses: actions/setup-dotnet@v4
+              with:
+                dotnet-version: '10.x'
+            - name: publish app
+              run: dotnet publish ./BlinkitGHA/BlinkitGHA.cjproj -c Release -o ./publish
+            - name: deploy to azure
+              uses: azure/webapps-deploy@v2
+              with:
+                    app-name: blinkit-webapp205
+                    package: ./publish
+
+
+
+
+
+
+
+
+
+
+
+#az ad sp create-for-rbac --name "myApp" --role contributor --scopes /subscriptions/2295e36e-a113-4734-a23b-8ba1dd05dad4 --sdk-auth              
