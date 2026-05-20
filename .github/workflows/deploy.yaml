@@ -1,4 +1,4 @@
-name: ci-build-asp.net-project
+name: ci-deploy-asp.net-project
 on:
     workflow_dispatch:
 jobs:
